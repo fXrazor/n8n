@@ -50,7 +50,7 @@ export const RESPONSE_ERROR_MESSAGES = {
 	OAUTH2_CREDENTIAL_TEST_FAILED: 'This OAuth2 credential was not connected to an account.',
 };
 
-export const AUTH_COOKIE_NAME = 'n8n-auth';
+export const AUTH_COOKIE_NAME = '__HOST-n8n-auth';
 
 export const NPM_COMMAND_TOKENS = {
 	NPM_PACKAGE_NOT_FOUND_ERROR: '404 Not Found',
