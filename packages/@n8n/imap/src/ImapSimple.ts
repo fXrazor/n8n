@@ -124,7 +124,7 @@ export class ImapSimple extends EventEmitter {
 		/** The message part to be downloaded, from the `message.attributes.struct` Array */
 		part: MessagePart,
 	) {
-		return await new Promise<string>((resolve, reject) => {
+		return await new Promise<Buffer | string>((resolve, reject) => {
 			const fetch = this.imap.fetch(message.attributes.uid, {
 				bodies: [part.partID],
 				struct: true,
@@ -142,15 +142,15 @@ export class ImapSimple extends EventEmitter {
 				const encoding = part.encoding.toUpperCase();
 
 				if (encoding === 'BASE64') {
-					resolve(Buffer.from(data, 'base64').toString());
+					resolve(Buffer.from(data, 'base64'));
 					return;
 				}
 
 				if (encoding === 'QUOTED-PRINTABLE') {
 					if (part.params?.charset?.toUpperCase() === 'UTF-8') {
-						resolve(Buffer.from(utf8.decode(qp.decode(data))).toString());
+						resolve(Buffer.from(utf8.decode(qp.decode(data))));
 					} else {
-						resolve(Buffer.from(qp.decode(data)).toString());
+						resolve(Buffer.from(qp.decode(data)));
 					}
 					return;
 				}
