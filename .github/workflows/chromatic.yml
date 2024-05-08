@@ -22,7 +22,30 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Publish to Chromatic
-        uses: chromaui/action@latest
+        uses: chromaui/action@v11
+        id: chromatic_tests
+        continue-on-error: true
         with:
           workingDir: packages/design-system
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: false
+
+      - name: Success comment
+        if: steps.chromatic_tests.outcome == 'success'
+        uses: peter-evans/create-or-update-comment@v4.0.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          edit-mode: replace
+          body: |
+            :white_check_mark: No visual regressions found.
+
+      - name: Fail comment
+        if: steps.chromatic_tests.outcome != 'success'
+        uses: peter-evans/create-or-update-comment@v4.0.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          edit-mode: replace
+          body: |
+            [:warning: Visual regressions found](${{steps.chromatic_tests.outputs.url}}): ${{steps.chromatic_tests.outputs.changeCount}}
