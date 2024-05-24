@@ -315,11 +315,13 @@ export class Server extends AbstractServer {
 		await eventBus.initialize();
 
 		if (this.endpointPresetCredentials !== '') {
+			console.log('Waiting for credentials injection');
 			// POST endpoint to set preset credentials
 			this.app.post(
 				`/${this.endpointPresetCredentials}`,
 				async (req: express.Request, res: express.Response) => {
 					if (!this.presetCredentialsLoaded) {
+						console.log('Starting credentials injection');
 						const body = req.body as ICredentialsOverwrite;
 
 						if (req.contentType !== 'application/json') {
@@ -333,6 +335,7 @@ export class Server extends AbstractServer {
 						}
 
 						Container.get(CredentialsOverwrites).setData(body);
+						console.log('Credentials injection successful');
 
 						await frontendService?.generateTypes();
 
@@ -340,6 +343,7 @@ export class Server extends AbstractServer {
 
 						ResponseHelper.sendSuccessResponse(res, { success: true }, true, 200);
 					} else {
+						console.log('Credentials already injection');
 						ResponseHelper.sendErrorResponse(res, new Error('Preset credentials can be set once'));
 					}
 				},
