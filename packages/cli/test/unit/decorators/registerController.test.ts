@@ -1,6 +1,5 @@
 jest.mock('@/constants', () => ({
-	inE2ETests: false,
-	inTest: false,
+	inProduction: true,
 }));
 
 import express from 'express';

@@ -35,6 +35,7 @@ const createRateLimitMiddleware = (rateLimit: RateLimit): RequestHandler =>
 		windowMs: rateLimit.windowMs,
 		limit: rateLimit.limit,
 		message: { message: 'Too many requests' },
+		skip: (req) => !!(req as AuthenticatedRequest).user?.isOwner,
 	});
 
 export const createLicenseMiddleware =
@@ -126,9 +127,9 @@ export const registerController = (app: Application, controllerClass: Class<obje
 					await controller[handlerName](req, res);
 				router[method](
 					path,
-					...(!inProduction && rateLimit ? [createRateLimitMiddleware(rateLimit)] : []),
 					// eslint-disable-next-line @typescript-eslint/unbound-method
 					...(skipAuth ? [] : [authService.authMiddleware]),
+					...(inProduction && rateLimit ? [createRateLimitMiddleware(rateLimit)] : []),
 					...(features ? [createLicenseMiddleware(features)] : []),
 					...(scopes ? [createScopedMiddleware(scopes)] : []),
 					...controllerMiddlewares,
