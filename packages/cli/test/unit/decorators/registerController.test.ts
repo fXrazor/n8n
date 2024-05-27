@@ -14,7 +14,7 @@ describe('registerController', () => {
 	@RestController('/test')
 	class TestController {
 		@Get('/unlimited', { skipAuth: true })
-		@Get('/rate-limited', { skipAuth: true, rateLimit: true })
+		@Get('/rate-limited', { skipAuth: true, rateLimit: {} })
 		endpoint() {
 			return { ok: true };
 		}
