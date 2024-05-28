@@ -55,7 +55,17 @@ export async function setSchema(conn: Connection) {
 		await conn.query(`CREATE SCHEMA IF NOT EXISTS ${schema}`);
 		searchPath.unshift(schema);
 	}
-	await conn.query(`SET search_path TO ${searchPath.join(',')};`);
+
+	try {
+		const databaseName = config.getEnv('database.postgresdb.database');
+		await conn.query(`ALTER DATABASE ${databaseName} SET search_path TO ${searchPath.join(',')}`);
+	} catch {
+		console.warn('WARNING: Could not set search_path for database. Using session instead.');
+		console.warn(
+			'This could cause issues. Please make sure that the database user has the permissions to set the search_path.',
+		);
+		await conn.query(`SET search_path TO ${searchPath.join(',')}`);
+	}
 }
 
 export async function init(): Promise<void> {
